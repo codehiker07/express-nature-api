@@ -1,11 +1,12 @@
 import fs from 'fs';
 import express from 'express';
+import { log } from 'console';
 
 const app = express()
 app.use(express.json())
 
 
-
+////First Test Express Setup
 // app.get('/', (req, res) => {
 //   res.status(200)
 // //   .send('Hello Bro')
@@ -16,10 +17,12 @@ app.use(express.json())
 //     res.status(200).send('You can post to this endpoint...');
 // })
 
+//// Read API Data From file
 const tours = JSON.parse(
   fs.readFileSync(`./dev-data/data/tours-simple.json`, 'utf8')
 )
 
+//// New API Data Assign
 app.post('/api/v1/tours', (req, res)=>{
   // console.log(req.body);
   const newId = tours[tours.length-1].id + 1;
@@ -36,7 +39,26 @@ app.post('/api/v1/tours', (req, res)=>{
   
 })
 
+//// Get API Data with /id search
+app.get('/api/v1/tours/:id', (req, res)=>{
+  // console.log(req.params);
+  const id = req.params.id * 1;
+  const tour = tours.find(el=>el.id === id)
+  if(!tour) {
+    return res.status(404).json({
+      status: 'Fail',
+      message: "Invalid Id",
 
+    })
+  }
+  res.status(200)
+  .json({
+    status: 'successfull',
+    data: {tour}
+  })
+})
+
+//// Get API in url
 app.get('/api/v1/tours', (req, res) => {
   res.status(200)
   .json({
